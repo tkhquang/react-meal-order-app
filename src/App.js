@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import Loading from "./components/Loading";
 import Login from "./components/Login";
 import Header from "./components/Header";
 import MenuPage from "./components/MenuPage";
@@ -18,18 +19,56 @@ class App extends Component {
     };
   }
 
-  logout = res => {
+  logout = () => {
+    window.localStorage.clear();
     this.setState({
       isAuthenticated: false,
       user: null
     });
   };
 
-  signin = data => {
+  signin = userData => {
+    window.localStorage.setItem("user", JSON.stringify({ ...userData }));
     this.setState({
-      isAuthenticated: data.isAuthenticated,
-      user: { ...data.user }
+      isAuthenticated: true,
+      user: { ...userData }
     });
+  };
+
+  loggedInCheck = () => {
+    if (!window.localStorage.getItem("user")) {
+      this.setState({
+        loading: false
+      });
+    } else {
+      const user = { ...JSON.parse(window.localStorage.getItem("user")) };
+      axios({
+        method: "post",
+        url: "localhost:3001/auth/verify", // placeholder
+        data: { token: user.token }
+      })
+        .then(res => {
+          this.props.signin({
+            isAuthenticated: true,
+            user: { ...res.data },
+            loading: false
+          });
+        })
+        .catch(err => {
+          console.log("Error:", err);
+          // this.setState({
+          //   error: true,
+          //   loading: false,
+          // });
+
+          // Testing
+          this.setState({
+            isAuthenticated: true,
+            user: { ...user },
+            loading: false
+          });
+        });
+    }
   };
 
   componentDidMount() {
@@ -37,43 +76,45 @@ class App extends Component {
       .get("localhost:3001/auth/google/login-url")
       .then(response => {
         this.setState({
-          loading: false,
           clientId: response.data["client_id"],
           redirectUri: response.data["redirect_url"]
         });
+        this.loggedInCheck();
       })
       .catch(err => {
-        //console.log("Error:", err);
-        this.setState({
-          loading: false,
-          error: true
-        });
+        console.log("Error:", err);
+        // this.setState({
+        //   error: true,
+        //   loading: false
+        // });
+        this.loggedInCheck(); // Testing
       });
   }
 
   render() {
     return (
-      <>
+      <div className="App">
         {this.state.loading ? (
-          "Loading"
+          <Loading />
+        ) : this.state.isAuthenticated ? (
+          <>
+            <Header
+              logout={this.logout}
+              user={this.state.user}
+              clientId={this.state.clientId}
+            />
+            <MenuPage />
+          </>
         ) : (
-          <div className="App">
-            {this.state.isAuthenticated ? (
-              <>
-                <Header logout={this.logout} clientId={this.state.clientId} />
-                <MenuPage />
-              </>
-            ) : (
-              <Login
-                signin={this.signin}
-                setGoogleInfo={this.setGoogleInfo}
-                clientId={this.state.clientId}
-                redirectUri={this.props.redirectUri}
-              />
-            )}
-          </div>
+          <Login
+            signin={this.signin}
+            setGoogleInfo={this.setGoogleInfo}
+            clientId={this.state.clientId}
+            redirectUri={this.props.redirectUri}
+            isSignedIn={true}
+          />
         )}
-      </>
+      </div>
     );
   }
 }

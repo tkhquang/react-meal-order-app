@@ -3,7 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.17",
+    "@fortawesome/free-brands-svg-icons": "^5.8.1",
+    "@fortawesome/free-solid-svg-icons": "^5.8.1",
+    "@fortawesome/react-fontawesome": "^0.1.4",
     "axios": "^0.18.0",
+    "i": "^0.3.6",
+    "npm": "^6.9.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-google-login": "^5.0.4",
@@ -34,6 +40,7 @@
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^1.2.0",
     "postcss-cli": "^6.1.2",
-    "tailwindcss": "^0.7.4"
+    "tailwindcss": "^0.7.4",
+    "tailwindcss-transition": "^1.0.5"
   }
 }
