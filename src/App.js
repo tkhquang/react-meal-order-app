@@ -40,35 +40,35 @@ class App extends Component {
       this.setState({
         loading: false
       });
-    } else {
-      const user = { ...JSON.parse(window.localStorage.getItem("user")) };
-      axios({
-        method: "post",
-        url: "localhost:3001/auth/verify", // placeholder
-        data: { token: user.token }
-      })
-        .then(res => {
-          this.props.signin({
-            isAuthenticated: true,
-            user: { ...res.data },
-            loading: false
-          });
-        })
-        .catch(err => {
-          console.log("Error:", err);
-          // this.setState({
-          //   error: true,
-          //   loading: false,
-          // });
-
-          // Testing
-          this.setState({
-            isAuthenticated: true,
-            user: { ...user },
-            loading: false
-          });
-        });
+      return;
     }
+    const user = { ...JSON.parse(window.localStorage.getItem("user")) };
+    axios({
+      method: "post",
+      url: "localhost:3001/auth/verify", // placeholder
+      data: { token: user.token }
+    })
+      .then(res => {
+        this.props.signin({
+          isAuthenticated: true,
+          user: { ...res.data },
+          loading: false
+        });
+      })
+      .catch(err => {
+        console.log("Error:", err);
+        // this.setState({
+        //   error: true,
+        //   loading: false,
+        // });
+
+        // Testing
+        this.setState({
+          isAuthenticated: true,
+          user: { ...user },
+          loading: false
+        });
+      });
   };
 
   componentDidMount() {
@@ -111,7 +111,7 @@ class App extends Component {
             setGoogleInfo={this.setGoogleInfo}
             clientId={this.state.clientId}
             redirectUri={this.props.redirectUri}
-            isSignedIn={true}
+            isSignedIn={false}
           />
         )}
       </div>

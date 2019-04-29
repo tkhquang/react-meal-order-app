@@ -425,6 +425,10 @@ button,
   display: inline-block;
 }
 
+.hidden {
+  display: none;
+}
+
 .flex {
   display: flex;
 }
@@ -620,6 +624,10 @@ button,
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+
+.align-middle {
+  vertical-align: middle;
 }
 
 .truncate {
