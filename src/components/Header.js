@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Logo from "../images/logo.svg";
 import UserPanel from "./UserPanel";
-import { GoogleLogout } from "react-google-login";
 
 const Header = props => {
   const [on, setOn] = useState(false);
@@ -19,20 +18,6 @@ const Header = props => {
   });
   return (
     <header className="sticky pin-t pin-l pin-r flex px-5 justify-between items-center h-12 shadow-md z-40">
-      {/* Hidden Logout Button, workaround for logout button not workinhg properly, plugin's issue */}
-      <GoogleLogout
-        clientId={props.clientId}
-        render={renderProps => (
-          <button
-            className="hidden"
-            onClick={renderProps.onClick}
-            disabled={renderProps.disabled}
-          >
-            Logout
-          </button>
-        )}
-        onLogoutSuccess={props.logout}
-      />
       <div className="inline-flex justify-center items-center">
         <img
           className="text-grey block w-10 h-10 m-auto object-cover rounded-full"

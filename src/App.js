@@ -4,115 +4,110 @@ import Loading from "./components/Loading";
 import Login from "./components/Login";
 import Header from "./components/Header";
 import MenuPage from "./components/MenuPage";
+import { GoogleAPI, googleGetBasicProfil } from "react-google-oauth";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
+      isMounted: false,
+      clientId: "",
       isAuthenticated: false,
       user: null,
-      // Testing
-      clientId:
-        "69429009715-i0h07ju17u4o6m8b6m0a4tt9k2dld881.apps.googleusercontent.com",
-      redirectUri: ""
+      token: ""
     };
   }
 
-  logout = () => {
-    window.localStorage.clear();
-    this.setState({
-      isAuthenticated: false,
-      user: null
-    });
-  };
-
-  signin = userData => {
-    window.localStorage.setItem("user", JSON.stringify({ ...userData }));
-    this.setState({
-      isAuthenticated: true,
-      user: { ...userData }
-    });
-  };
-
-  loggedInCheck = () => {
-    if (!window.localStorage.getItem("user")) {
-      this.setState({
-        loading: false
-      });
-      return;
-    }
-    const user = { ...JSON.parse(window.localStorage.getItem("user")) };
+  signInToGoogle = () => {
+    const userProfile = googleGetBasicProfil();
     axios({
-      method: "post",
-      url: "localhost:3001/auth/verify", // placeholder
-      data: { token: user.token }
+      method: "get",
+      url: "http://localhost:8000/auth/google/callback",
+      params: {
+        state: this.state.token,
+        email: userProfile.email
+      }
     })
       .then(res => {
-        this.props.signin({
+        this.setState({
           isAuthenticated: true,
-          user: { ...res.data },
+          user: {
+            ...userProfile,
+            fortressName: res.data.name,
+            token: res.data.token,
+            id: res.data.id
+          },
           loading: false
         });
       })
       .catch(err => {
-        console.log("Error:", err);
-        // this.setState({
-        //   error: true,
-        //   loading: false,
-        // });
-
-        // Testing
+        console.log("Get Callback Error:", err);
         this.setState({
-          isAuthenticated: true,
-          user: { ...user },
-          loading: false
+          loading: false,
+          error: true
         });
       });
+  };
+
+  signOutOfGoogle = () => {
+    this.setState({
+      isAuthenticated: false,
+      user: null,
+      loading: false
+    });
+  };
+
+  onUpdateSigninStatus = isSignIn => {
+    if (isSignIn) {
+      this.signInToGoogle();
+      return;
+    }
+    this.signOutOfGoogle();
   };
 
   componentDidMount() {
     axios
-      .get("localhost:3001/auth/google/login-url")
+      .get("http://localhost:8000/auth/google/login-url")
       .then(response => {
         this.setState({
           clientId: response.data["client_id"],
-          redirectUri: response.data["redirect_url"]
+          redirectUri: response.data["redirect_uri"],
+          token: response.data["state"],
+          isMounted: true
         });
-        this.loggedInCheck();
       })
       .catch(err => {
-        console.log("Error:", err);
-        // this.setState({
-        //   error: true,
-        //   loading: false
-        // });
-        this.loggedInCheck(); // Testing
+        console.log("Get auth/google/login-url:", err);
+        this.setState({
+          error: true
+        });
       });
   }
 
   render() {
     return (
-      <div className="App">
-        {this.state.loading ? (
-          <Loading />
-        ) : this.state.isAuthenticated ? (
-          <>
-            <Header
-              logout={this.logout}
-              user={this.state.user}
-              clientId={this.state.clientId}
-            />
-            <MenuPage />
-          </>
-        ) : (
-          <Login
-            signin={this.signin}
-            setGoogleInfo={this.setGoogleInfo}
+      <div>
+        {this.state.isMounted && (
+          <GoogleAPI
             clientId={this.state.clientId}
-            redirectUri={this.props.redirectUri}
-            isSignedIn={false}
-          />
+            onUpdateSigninStatus={this.onUpdateSigninStatus}
+          >
+            {this.state.loading ? (
+              <Loading />
+            ) : this.state.isAuthenticated ? (
+              <>
+                <Header
+                  logout={this.logout}
+                  user={this.state.user}
+                  clientId={this.state.clientId}
+                />
+                <MenuPage />
+              </>
+            ) : (
+              <Login />
+            )}
+          </GoogleAPI>
         )}
       </div>
     );

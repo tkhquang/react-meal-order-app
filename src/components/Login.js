@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import GoogleLogin from "react-google-login";
-import axios from "axios";
+import { CustomGoogleLogin } from "react-google-oauth";
 import Logo from "../images/logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
@@ -13,42 +12,8 @@ class Login extends Component {
     };
   }
 
-  responseGoogle = response => {
-    const { name, googleId, email } = { ...response.profileObj };
-    const requestBody = {
-      name: name,
-      email: email,
-      google_id: googleId
-    };
-    axios({
-      method: "post",
-      url: "localhost:3001/auth/login/google",
-      data: requestBody
-    })
-      .then(res => {
-        this.props.signin({
-          ...res.profileObj,
-          token: res.data.token,
-          id: res.data.id
-        });
-      })
-      .catch(err => {
-        console.log("Error:", err);
-        // this.setState({
-        //   loading: false,
-        //   error: true
-        // });
-
-        // Testing
-        this.props.signin({
-          ...response.profileObj,
-          token: "",
-          id: 1
-        });
-      });
-  };
   responseError = err => {
-    //console.log(err);
+    console.log("Login Error: ", err);
     this.setState({
       error: true
     });
@@ -65,23 +30,14 @@ class Login extends Component {
               alt=""
             />
           </div>
-          <GoogleLogin
-            clientId={this.props.clientId}
-            redirectUri={this.props.redirectUri}
-            render={renderProps => (
-              <button
-                className="px-5 sm:px-6 md:px-10 py-3 text-white text-lg my-3 bg-purple-dark hover:bg-purple-light rounded shadow transition"
-                onClick={renderProps.onClick}
-                disabled={renderProps.disabled}
-                title="Login With Google"
-              >
-                <FontAwesomeIcon icon={faGoogle} /> Login with Google
-              </button>
-            )}
-            onSuccess={this.responseGoogle}
-            onFailure={this.responseError}
-            cookiePolicy={"single_host_origin"}
-          />
+          <CustomGoogleLogin
+            tag="button"
+            className="px-5 sm:px-6 md:px-10 py-3 text-white text-lg my-3 bg-purple-dark hover:bg-purple-light rounded shadow transition"
+            title="Login With Google"
+            onLoginFailure={this.responseError}
+          >
+            <FontAwesomeIcon icon={faGoogle} /> Login with Google
+          </CustomGoogleLogin>
         </div>
       </div>
     );

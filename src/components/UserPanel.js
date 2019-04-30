@@ -7,11 +7,11 @@ class UserPanel extends Component {
     if (window.gapi) {
       const auth2 = window.gapi.auth2.getAuthInstance();
       if (auth2 != null) {
-        if (!auth2.isSignedIn.Ab) {
-          auth2.disconnect().then(this.props.logout);
+        if (!auth2.isSignedIn.get()) {
+          auth2.disconnect();
           return;
         }
-        auth2.signOut().then(auth2.disconnect().then(this.props.logout));
+        auth2.signOut().then(auth2.disconnect());
       }
     }
     this.forceUpdate();
