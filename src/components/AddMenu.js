@@ -1,34 +1,9 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { getStringDate, getFormattedDate } from "../helpers";
-import InputLabel from "@material-ui/core/InputLabel";
-import TimeInput from "material-ui-time-picker";
-import { withStyles } from "@material-ui/core/styles";
 import Button from "./Button";
-
-const styles = {
-  timeIcon: {
-    "&::before": {
-      content: `"\\1F55D"`,
-      position: "absolute",
-      left: "1rem"
-    }
-  },
-  labelText: {
-    color: "#000",
-    textAlign: "center"
-  },
-  inputTime: {
-    textAlign: "center"
-  },
-  requireInput: {
-    "&::before": {
-      content: `"*"`,
-      fontWeight: "bold",
-      color: "#F00"
-    }
-  }
-};
+import TimeContainer from "./TimeContainer";
+import InpageError from "./InpageError";
 
 class AddMenu extends Component {
   constructor(props) {
@@ -37,7 +12,12 @@ class AddMenu extends Component {
     this.state = {
       posting: false,
       deadline: getFormattedDate(new Date(), 10, 30, 0),
-      remind: getFormattedDate(new Date(), 14, 30, 0)
+      remind: getFormattedDate(new Date(), 14, 30, 0),
+      error: {
+        status: false,
+        code: null,
+        message: ""
+      }
     };
   }
 
@@ -71,56 +51,66 @@ class AddMenu extends Component {
     console.log(requestBody);
 
     this.setState({
-      posting: true
+      posting: true,
+      error: {
+        status: false
+      }
     });
     axios({
       method: "post",
       url: "http://localhost:8000/menus",
-      data: requestBody
+      data: JSON.stringify(requestBody)
     })
       .then(res => {
         if (res.status !== 201) {
-          // Custom Error
           this.setState({
-            posting: false
+            posting: false,
+            error: {
+              status: true,
+              message: "Invalid Response from Server"
+            }
           });
           return;
         }
-        axios
-          .get("http://localhost:8000/menus")
-          .then(res => {
-            if (res.status !== 200) {
-              // Custom Error
-              this.setState({
-                posting: false
-              });
-              return;
-            }
-            this.props.setMenu(res.data);
-            this.setState({
-              posting: false
-            });
-          })
-          .catch(err => {
-            console.log(err);
-            this.setState({
-              posting: false
-            });
-          });
+        this.setState({
+          posting: false
+        });
+        this.props.getMenu();
       })
       .catch(err => {
-        console.log(err);
+        // if (err.response) {
+        //   this.setState({
+        //     posting: false,
+        //     error: {
+        //       status: true,
+        //       code: err.response.status,
+        //       message: err.response.data.message
+        //     }
+        //   });
+        //   return;
+        // }
+        // this.setState({
+        //   posting: false,
+        //   error: {
+        //     status: true,
+        //     message: "Network Error"
+        //   }
+        // });
+
         // Testing
         setTimeout(() => {
           this.setState({
-            posting: false
+            posting: false,
+            error: {
+              status: true,
+              message: "Network Error"
+            }
           });
-        }, 3000);
+        }, 2000);
       });
   };
 
   render() {
-    const { classes } = this.props;
     return (
       <main className="flex flex-col items-center">
         <form
@@ -132,10 +122,7 @@ class AddMenu extends Component {
             {getStringDate(new Date(), "/")}
           </h1>
           <div className="flex w-full items-center flex-wrap">
-            <label
-              className={`w-full h-6 ${classes.requireInput}`}
-              htmlFor="menu"
-            >
+            <label className="w-full h-6" htmlFor="menu">
               Add menu:
             </label>
             <textarea
@@ -149,41 +136,21 @@ class AddMenu extends Component {
             />
           </div>
           <div className="flex flex-wrap md:flex-no-wrap w-full items-center md:h-12">
-            <InputLabel
-              className="w-1/2 my-2 md:w-auto md:flex-1"
-              htmlFor="deadline-input"
-              classes={{ root: classes.labelText }}
-            >
-              Deadline:
-            </InputLabel>
-            <TimeInput
+            <TimeContainer
               id="deadline-input"
-              className={`w-1/2 min-w-24 my-2 md:w-auto md:flex-1 border-2 border-blue-light ${
-                classes.timeIcon
-              }`}
-              mode="24h"
+              textLabel="Deadline:"
               value={this.state.deadline}
               onChange={this.handleDeadlineChange}
-              disableUnderline={true}
-              inputProps={{ className: classes.inputTime }}
+              labelClassName="w-1/2 my-2 md:w-auto md:flex-1"
+              inputClassName="w-1/2 min-w-24 my-2 md:w-auto md:flex-1 border-2 border-blue-light"
             />
-            <InputLabel
-              className="w-1/2 my-2 md:w-auto md:flex-1"
-              htmlFor="remind-input"
-              classes={{ root: classes.labelText }}
-            >
-              Remind to pay:
-            </InputLabel>
-            <TimeInput
+            <TimeContainer
               id="remind-input"
-              className={`w-1/2 min-w-24 my-2 md:w-auto md:flex-1 border-2 border-blue-light ${
-                classes.timeIcon
-              }`}
-              mode="24h"
+              textLabel="Remind to pay:"
               value={this.state.remind}
               onChange={this.handleRemindChange}
-              disableUnderline={true}
-              inputProps={{ className: classes.inputTime }}
+              labelClassName="w-1/2 my-2 md:w-auto md:flex-1"
+              inputClassName="w-1/2 min-w-24 my-2 md:w-auto md:flex-1 border-2 border-blue-light"
             />
           </div>
           <div className="flex w-full items-center justify-end">
@@ -194,9 +161,16 @@ class AddMenu extends Component {
             />
           </div>
         </form>
+        {this.state.error.status && (
+          <InpageError
+            text="sending data"
+            code={this.state.error.code}
+            message={this.state.error.message}
+          />
+        )}
       </main>
     );
   }
 }
 
-export default withStyles(styles)(AddMenu);
+export default AddMenu;

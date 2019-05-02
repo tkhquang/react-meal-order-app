@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import axios from "axios";
+import InpageLoading from "./InpageLoading";
 import Overview from "./Overview";
 import AddMenu from "./AddMenu";
+import ErrorPage from "./ErrorPage";
 
 class MenuPage extends Component {
   constructor(props) {
@@ -9,43 +11,77 @@ class MenuPage extends Component {
     this.state = {
       loading: true,
       data: null,
-      error: false
+      error: {
+        status: false,
+        code: null,
+        message: ""
+      }
     };
   }
 
-  setMenu = data => {
+  getMenu = () => {
     this.setState({
-      data
+      loading: true
     });
-  };
-
-  componentDidMount() {
     axios
       .get("http://localhost:8000/menus")
-      .then(response => {
+      .then(res => {
+        if (res.status !== 200) {
+          this.setState({
+            loading: false,
+            error: {
+              status: true,
+              message: "Invalid Response from Server"
+            }
+          });
+          return;
+        }
         this.setState({
           loading: false,
-          data: response.data
+          data: res.data
         });
       })
       .catch(err => {
-        console.log("Error:", err);
+        if (err.response) {
+          this.setState({
+            loading: false,
+            error: {
+              status: true,
+              code: err.response.status,
+              message: err.response.data.message
+            }
+          });
+          return;
+        }
         this.setState({
           loading: false,
-          error: true
+          error: {
+            status: true,
+            message: "Network Error"
+          }
         });
       });
+  };
+
+  componentDidMount() {
+    this.getMenu();
   }
 
   render() {
     return (
       <>
         {this.state.loading ? (
-          "Loading"
+          <InpageLoading />
+        ) : false ? ( // this.state.error.status
+          <ErrorPage
+            text="fetching data"
+            code={this.state.error.code}
+            message={this.state.error.message}
+          />
         ) : false ? ( // !Object.keys(this.state.data).length === 0
           <Overview />
         ) : (
-          <AddMenu user={this.props.user} setMenu={this.setMenu} />
+          <AddMenu user={this.props.user} getMenu={this.getMenu} />
         )}
       </>
     );
