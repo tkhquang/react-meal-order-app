@@ -1,20 +1,20 @@
 import React, { Component } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faSignOutAlt, faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 class UserPanel extends Component {
-  signOut = () => {
-    if (window.gapi) {
-      const auth2 = window.gapi.auth2.getAuthInstance();
-      if (auth2 != null) {
-        if (!auth2.isSignedIn.get()) {
-          auth2.disconnect();
-          return;
-        }
-        auth2.signOut().then(auth2.disconnect());
-      }
-    }
-    this.forceUpdate();
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false
+    };
+  }
+
+  handleLogOutClick = () => {
+    this.setState({
+      loading: true
+    });
+    this.props.signOut();
   };
 
   render() {
@@ -23,7 +23,7 @@ class UserPanel extends Component {
         <div className="block p-3">
           <div className="m-auto">
             <img
-              className="text-grey align-middle block w-24 h-24 m-auto object-cover rounded-full bg-grey-light"
+              className="text-grey align-middle img-fit w-24 h-24 bg-grey-light"
               src={this.props.user.imageUrl}
               alt=""
             />
@@ -39,11 +39,17 @@ class UserPanel extends Component {
         </div>
         <div className="bg-grey h-px mx-1" />
         <button
-          className="inline-block py-3 w-full m-auto text-black hover:bg-grey-light"
-          onClick={this.signOut}
+          className="inline-block py-3 w-full m-auto text-black hover:bg-grey-light disabled:bg-grey disabled:cursor-not-allowed"
+          onClick={this.handleLogOutClick}
           title="Logout"
         >
-          <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+          {this.state.loading ? (
+            <FontAwesomeIcon icon={faSpinner} spin />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+            </>
+          )}
         </button>
       </div>
     );

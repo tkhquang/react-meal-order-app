@@ -4,7 +4,7 @@ import loadingSVG from "../images/loading.svg";
 const Loading = () => (
   <div>
     <img
-      className="max-w-xs m-auto h-screen flex justify-center items-center"
+      className="max-w-xs m-auto h-screen flex-center"
       src={loadingSVG}
       alt=""
     />

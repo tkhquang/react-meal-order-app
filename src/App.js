@@ -4,57 +4,134 @@ import Loading from "./components/Loading";
 import Login from "./components/Login";
 import Header from "./components/Header";
 import MenuPage from "./components/MenuPage";
-import { GoogleAPI, googleGetBasicProfil } from "react-google-oauth";
+import ErrorPage from "./components/ErrorPage";
+import {
+  GoogleAPI,
+  googleGetBasicProfil,
+  googleGetAuthResponse
+} from "react-google-oauth";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      isMounted: false,
-      clientId: "",
       isAuthenticated: false,
       user: null,
-      token: ""
+      state: "",
+      error: {
+        status: false,
+        code: null,
+        message: ""
+      }
     };
   }
 
+  signOut = () => {
+    if (window.gapi) {
+      const auth2 = window.gapi.auth2.getAuthInstance();
+      if (auth2 != null) {
+        if (!auth2.isSignedIn.get()) {
+          auth2.disconnect();
+          return;
+        }
+        auth2.signOut().then(auth2.disconnect());
+      }
+    }
+  };
+
   signInToGoogle = () => {
     const userProfile = googleGetBasicProfil();
+    const userAuthRes = googleGetAuthResponse();
     axios({
       method: "get",
-      url: "http://localhost:8000/auth/google/callback",
-      params: {
-        state: this.state.token,
-        email: userProfile.email
+      url: `${process.env.REACT_APP_API}/auth/google/callback`,
+      headers: {
+        id_token: userAuthRes.id_token
       }
     })
       .then(res => {
         this.setState({
+          loading: false,
           isAuthenticated: true,
           user: {
             ...userProfile,
             fortressName: res.data.name,
-            token: res.data.token,
+            access_token: res.data.access_token,
             id: res.data.id
-          },
-          loading: false
+          }
         });
       })
       .catch(err => {
-        console.log("Get Callback Error:", err);
+        this.signOut();
+        if (err.response) {
+          this.setState({
+            loading: false,
+            error: {
+              status: true,
+              code: err.response.status,
+              message: err.response.data.error
+                ? err.response.data.error.message
+                : err.response.data
+            }
+          });
+          return;
+        }
         this.setState({
           loading: false,
-          error: true
+          error: {
+            status: true,
+            message: "Network Error"
+          }
         });
       });
   };
 
   signOutOfGoogle = () => {
+    if (this.state.user) {
+      axios({
+        method: "post",
+        url: `${process.env.REACT_APP_API}/auth/google/logout`,
+        headers: {
+          access_token: this.state.user.access_token
+        }
+      })
+        .then(() => {
+          this.setState({
+            loading: false,
+            isAuthenticated: false,
+            user: null
+          });
+          return;
+        })
+        .catch(err => {
+          if (err.response) {
+            this.setState({
+              loading: false,
+              error: {
+                status: true,
+                code: err.response.status,
+                message: err.response.data.error
+                  ? err.response.data.error.message
+                  : err.response.data
+              }
+            });
+            return;
+          }
+          this.setState({
+            loading: false,
+            error: {
+              status: true,
+              message: "Network Error"
+            }
+          });
+        });
+      return;
+    }
     this.setState({
+      loading: false,
       isAuthenticated: false,
-      user: null,
-      loading: false
+      user: null
     });
   };
 
@@ -66,50 +143,32 @@ class App extends Component {
     this.signOutOfGoogle();
   };
 
-  componentDidMount() {
-    axios
-      .get("http://localhost:8000/auth/google/login-url")
-      .then(response => {
-        this.setState({
-          clientId: response.data["client_id"],
-          redirectUri: response.data["redirect_uri"],
-          token: response.data["state"],
-          isMounted: true
-        });
-      })
-      .catch(err => {
-        console.log("Get auth/google/login-url:", err);
-        this.setState({
-          error: true
-        });
-      });
-  }
-
   render() {
     return (
-      <div>
-        {this.state.isMounted && (
-          <GoogleAPI
-            clientId={this.state.clientId}
-            onUpdateSigninStatus={this.onUpdateSigninStatus}
-          >
-            {this.state.loading ? (
-              <Loading />
-            ) : this.state.isAuthenticated ? (
+      <GoogleAPI
+        clientId={process.env.REACT_APP_CLIENT_ID}
+        onUpdateSigninStatus={this.onUpdateSigninStatus}
+      >
+        {this.state.loading ? (
+          <Loading />
+        ) : this.state.error.status ? (
+          <ErrorPage
+            code={this.state.error.code}
+            message={this.state.error.message}
+          />
+        ) : (
+          <>
+            {this.state.isAuthenticated ? (
               <>
-                <Header
-                  logout={this.logout}
-                  user={this.state.user}
-                  clientId={this.state.clientId}
-                />
-                <MenuPage />
+                <Header user={this.state.user} signOut={this.signOut} />
+                <MenuPage user={this.state.user} />
               </>
             ) : (
               <Login />
             )}
-          </GoogleAPI>
+          </>
         )}
-      </div>
+      </GoogleAPI>
     );
   }
 }

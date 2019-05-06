@@ -6,7 +6,7 @@
 
   ## Uncomment to use this redirect for Single Page Applications like create-react-app. 
   ## Not needed for static site generators.
-  [[redirects]]
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
@@ -19,3 +19,13 @@
   #  publish = "dist" # Folder with the static content for _redirect file
   
   ## more info on configuring this file: https://www.netlify.com/docs/netlify-toml-reference/ 
+
+[context.production.environment]
+  REACT_APP_API = "https://datcom.sudojoss.com"
+  REACT_APP_CLIENT_ID="69429009715-i0h07ju17u4o6m8b6m0a4tt9k2dld881.apps.googleusercontent.com"
+[context.deploy-preview.environment]
+  REACT_APP_API = "https://datcom.sudojoss.com"
+  REACT_APP_CLIENT_ID="69429009715-i0h07ju17u4o6m8b6m0a4tt9k2dld881.apps.googleusercontent.com"
+[context.branch-deploy.environment]
+  REACT_APP_API = "https://datcom.sudojoss.com"
+  REACT_APP_CLIENT_ID="69429009715-i0h07ju17u4o6m8b6m0a4tt9k2dld881.apps.googleusercontent.com"

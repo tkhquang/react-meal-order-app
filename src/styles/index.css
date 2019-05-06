@@ -1,0 +1,38 @@
+@tailwind preflight;
+@tailwind components;
+@tailwind utilities;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.btn {
+  @apply px-5 py-3 text-white text-lg my-3 bg-blue-dark rounded shadow transition;
+}
+
+.btn:hover,
+.btn:focus {
+  @apply bg-blue-light;
+}
+
+.btn:disabled {
+  @apply bg-grey cursor-not-allowed;
+}
+
+.flex-col-full {
+  @apply flex flex-col w-full justify-center items-center;
+}
+
+.flex-center {
+  @apply flex justify-center items-center;
+}
+
+.default-border {
+  @apply border-2 border-blue-light;
+}
+
+.img-fit {
+  @apply block object-cover m-auto rounded-full;
+}

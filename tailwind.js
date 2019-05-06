@@ -859,7 +859,7 @@ module.exports = {
   modules: {
     appearance: ["responsive"],
     backgroundAttachment: ["responsive"],
-    backgroundColors: ["responsive", "hover", "focus"],
+    backgroundColors: ["responsive", "hover", "focus", "disabled"],
     backgroundPosition: ["responsive"],
     backgroundRepeat: ["responsive"],
     backgroundSize: ["responsive"],
@@ -883,7 +883,7 @@ module.exports = {
     minHeight: ["responsive"],
     minWidth: ["responsive"],
     negativeMargin: ["responsive"],
-    objectFit: false,
+    objectFit: ["responsive"],
     objectPosition: false,
     opacity: ["responsive"],
     outline: ["focus"],
@@ -897,7 +897,7 @@ module.exports = {
     svgStroke: [],
     tableLayout: ["responsive"],
     textAlign: ["responsive"],
-    textColors: ["responsive", "hover", "focus"],
+    textColors: ["responsive", "hover", "focus", "disabled"],
     textSizes: ["responsive"],
     textStyle: ["responsive", "hover", "focus"],
     tracking: ["responsive"],
@@ -935,7 +935,14 @@ module.exports = {
         "normal-in-out-quad": "all 2s cubic-bezier(0.455, 0.03, 0.515, 0.955)",
         "slow-in-out-quad": "all 2s cubic-bezier(0.455, 0.03, 0.515, 0.955)"
       }
-    })
+    }),
+    function({ addVariant }) {
+      addVariant("disabled", ({ modifySelectors, separator }) => {
+        modifySelectors(({ className }) => {
+          return `.disabled${separator}${className}:disabled`;
+        });
+      });
+    }
   ],
 
   /*
