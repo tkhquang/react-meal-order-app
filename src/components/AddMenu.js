@@ -4,13 +4,15 @@ import { getStringDate, getFormattedDate } from "../helpers";
 import Button from "./Button";
 import TimeContainer from "./TimeContainer";
 import InpageError from "./InpageError";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 class AddMenu extends Component {
   constructor(props) {
     super(props);
     this.listRef = React.createRef();
     this.state = {
-      posting: false,
+      loading: false,
       deadline: getFormattedDate(new Date(), 10, 30, 0),
       remind: getFormattedDate(new Date(), 14, 30, 0),
       error: {
@@ -41,78 +43,60 @@ class AddMenu extends Component {
       .filter(i => Boolean(i));
     const requestBody = {
       menu: {
-        owner_id: 1, // this.props.user.id
+        owner_id: this.props.user.id,
         name: `lunch_${getStringDate(new Date(), "_")}`,
         deadline: this.state.deadline,
         payment_reminder: this.state.remind
       },
       item_names: [...itemList]
     };
-    console.log(requestBody);
-
     this.setState({
-      posting: true,
+      loading: true,
       error: {
         status: false
       }
     });
     axios({
       method: "post",
-      url: "http://localhost:8000/menus",
+      url: `${process.env.REACT_APP_API}/menus`,
+      headers: {
+        access_token: this.props.user.access_token
+      },
       data: JSON.stringify(requestBody)
     })
-      .then(res => {
-        if (res.status !== 201) {
+      .then(() => {
+        this.setState({
+          loading: false
+        });
+        this.props.getMenu();
+      })
+      .catch(err => {
+        if (err.response) {
           this.setState({
-            posting: false,
+            loading: false,
             error: {
               status: true,
-              message: "Invalid Response from Server"
+              code: err.response.status,
+              message: err.response.data.error
+                ? err.response.data.error.message
+                : err.response.data
             }
           });
           return;
         }
         this.setState({
-          posting: false
+          loading: false,
+          error: {
+            status: true,
+            message: "Network Error"
+          }
         });
-        this.props.getMenu();
-      })
-      .catch(err => {
-        // if (err.response) {
-        //   this.setState({
-        //     posting: false,
-        //     error: {
-        //       status: true,
-        //       code: err.response.status,
-        //       message: err.response.data.message
-        //     }
-        //   });
-        //   return;
-        // }
-        // this.setState({
-        //   posting: false,
-        //   error: {
-        //     status: true,
-        //     message: "Network Error"
-        //   }
-        // });
-
-        // Testing
-        setTimeout(() => {
-          this.setState({
-            posting: false,
-            error: {
-              status: true,
-              message: "Network Error"
-            }
-          });
-        }, 2000);
       });
   };
 
   render() {
     return (
-      <main className="flex flex-col items-center">
+      <main className="flex-col-full">
         <form
           className="flex flex-wrap w-4/5 md:w-3/4"
           action=""
@@ -127,7 +111,7 @@ class AddMenu extends Component {
             </label>
             <textarea
               ref={this.listRef}
-              className="w-full block shadow-none text-grey-darker border-2 border-blue-light rounded py-3 px-4 mb-3 leading-tight focus:outline-none bg-white focus:bg-grey-lighter"
+              className="default-input w-full py-3 px-4 mb-3"
               name="list"
               cols="80"
               rows="12"
@@ -142,7 +126,7 @@ class AddMenu extends Component {
               value={this.state.deadline}
               onChange={this.handleDeadlineChange}
               labelClassName="w-1/2 my-2 md:w-auto md:flex-1"
-              inputClassName="w-1/2 min-w-24 my-2 md:w-auto md:flex-1 border-2 border-blue-light"
+              inputClassName="w-1/2 min-w-24 my-2 md:w-auto md:flex-1 default-border"
             />
             <TimeContainer
               id="remind-input"
@@ -150,20 +134,25 @@ class AddMenu extends Component {
               value={this.state.remind}
               onChange={this.handleRemindChange}
               labelClassName="w-1/2 my-2 md:w-auto md:flex-1"
-              inputClassName="w-1/2 min-w-24 my-2 md:w-auto md:flex-1 border-2 border-blue-light"
+              inputClassName="w-1/2 min-w-24 my-2 md:w-auto md:flex-1 default-border"
             />
           </div>
           <div className="flex w-full items-center justify-end">
             <Button
-              posting={this.state.posting}
+              classes="btn sm:px-6 md:px-8"
+              disabled={this.state.loading}
+              type="submit"
               defaultText="Publish Menu"
-              postingText="Publishing Menu"
+              disabledText={
+                <span>
+                  <FontAwesomeIcon icon={faSpinner} spin /> Publishing Menu
+                </span>
+              }
             />
           </div>
         </form>
         {this.state.error.status && (
           <InpageError
-            text="sending data"
             code={this.state.error.code}
             message={this.state.error.message}
           />

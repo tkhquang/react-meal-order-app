@@ -156,17 +156,13 @@ class App extends Component {
             code={this.state.error.code}
             message={this.state.error.message}
           />
-        ) : (
+        ) : this.state.isAuthenticated ? (
           <>
-            {this.state.isAuthenticated ? (
-              <>
-                <Header user={this.state.user} signOut={this.signOut} />
-                <MenuPage user={this.state.user} />
-              </>
-            ) : (
-              <Login />
-            )}
+            <Header user={this.state.user} signOut={this.signOut} />
+            <MenuPage user={this.state.user} />
           </>
+        ) : (
+          <Login />
         )}
       </GoogleAPI>
     );

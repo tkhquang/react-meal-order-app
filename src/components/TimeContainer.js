@@ -35,7 +35,8 @@ const TimeContainer = props => {
         id={props.id}
         className={`${props.inputClassName} ${classes.timeIcon}`}
         mode="24h"
-        value={props.value}
+        {...props.value && { value: props.value }}
+        {...props.default && { defaultValue: props.default }}
         onChange={props.onChange}
         disableUnderline={true}
         inputProps={{ className: classes.inputTime }}

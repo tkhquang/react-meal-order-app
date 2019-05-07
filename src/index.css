@@ -30,7 +30,7 @@ main {
 
 h1 {
   font-size: 2em;
-  margin: 0.67em 0;
+  margin: .67em 0;
 }
 
 /* Grouping content
@@ -65,6 +65,7 @@ a {
 /**
  * Add the correct font weight in Chrome, Edge, and Safari.
  */
+
 
 strong {
   font-weight: bolder;
@@ -109,7 +110,8 @@ img {
  */
 
 button,
-input {
+input,
+textarea {
   font-family: inherit; /* 1 */
   font-size: 100%; /* 1 */
   line-height: 1.15; /* 1 */
@@ -198,6 +200,10 @@ legend {
 /**
  * Remove the default vertical scrollbar in IE 10+.
  */
+
+textarea {
+  overflow: auto;
+}
 
 /**
  * 1. Add the correct box sizing in IE 10.
@@ -295,6 +301,8 @@ legend {
  * Removes the default spacing and border for appropriate elements.
  */
 
+
+dd,
 h1,
 p {
   margin: 0;
@@ -357,14 +365,19 @@ img {
   border-style: solid;
 }
 
+textarea {
+  resize: vertical;
+}
+
 img {
   max-width: 100%;
   height: auto;
 }
 
-input::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: inherit;
-  opacity: 0.5;
+  opacity: .5;
 }
 
 button,
@@ -396,6 +409,10 @@ button,
   cursor: pointer;
 }
 
+.disabled\:cursor-not-allowed:disabled {
+  cursor: not-allowed;
+}
+
 .block {
   display: block;
 }
@@ -412,8 +429,20 @@ button,
   display: inline-flex;
 }
 
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
 .items-center {
   align-items: center;
+}
+
+.self-start {
+  align-self: flex-start;
+}
+
+.justify-end {
+  justify-content: flex-end;
 }
 
 .justify-center {
@@ -426,6 +455,10 @@ button,
 
 .font-medium {
   font-weight: 500;
+}
+
+.h-6 {
+  height: 1.5rem;
 }
 
 .h-10 {
@@ -465,23 +498,28 @@ button,
 }
 
 .mx-1 {
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
+  margin-left: .25rem;
+  margin-right: .25rem;
 }
 
 .my-2 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
 }
 
 .mx-2 {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-left: .5rem;
+  margin-right: .5rem;
 }
 
 .my-4 {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.my-6 {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .mx-auto {
@@ -490,7 +528,11 @@ button,
 }
 
 .ml-2 {
-  margin-left: 0.5rem;
+  margin-left: .5rem;
+}
+
+.mb-3 {
+  margin-bottom: .75rem;
 }
 
 .max-w-xs {
@@ -501,18 +543,27 @@ button,
   min-height: 100vh;
 }
 
+.min-w-24 {
+  min-width: 6rem;
+}
+
 .p-3 {
-  padding: 0.75rem;
+  padding: .75rem;
 }
 
 .py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding-top: .75rem;
+  padding-bottom: .75rem;
 }
 
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .px-5 {
@@ -551,12 +602,11 @@ button,
 }
 
 .shadow-md {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .12), 0 2px 4px 0 rgba(0, 0, 0, .08);
 }
 
 .shadow-lg {
-  box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.11),
-    0 5px 15px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 15px 30px 0 rgba(0, 0, 0, .11), 0 5px 15px 0 rgba(0, 0, 0, .08);
 }
 
 .text-center {
@@ -575,12 +625,16 @@ button,
   color: #e3342f;
 }
 
+.text-blue-darker {
+  color: #1c3d5a;
+}
+
 .text-blue-dark {
   color: #2779bd;
 }
 
 .text-sm {
-  font-size: 0.875rem;
+  font-size: .875rem;
 }
 
 .text-xl {
@@ -593,8 +647,8 @@ button,
 
 .select-none {
   -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 
 .align-middle {
@@ -623,6 +677,14 @@ button,
   width: 16rem;
 }
 
+.w-1\/2 {
+  width: 50%;
+}
+
+.w-4\/5 {
+  width: 80%;
+}
+
 .w-full {
   width: 100%;
 }
@@ -644,16 +706,16 @@ button,
 .btn {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding-top: .75rem;
+  padding-bottom: .75rem;
   color: #fff;
   font-size: 1.125rem;
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-top: .75rem;
+  margin-bottom: .75rem;
   background-color: #2779bd;
-  border-radius: 0.25rem;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  border-radius: .25rem;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+  transition: all .3s ease;
 }
 
 .btn:hover,
@@ -690,4 +752,56 @@ button,
   object-fit: cover;
   margin: auto;
   border-radius: 9999px;
+}
+
+.default-input {
+  display: block;
+  color: #606f7b;
+  border-width: 2px;
+  border-color: #6cb2eb;
+  border-radius: .25rem;
+  line-height: 1.25;
+  background-color: #fff;
+  box-shadow: none;
+}
+
+.default-input:focus {
+  outline: 0;
+  background-color: #f1f5f8;
+}
+
+@media (min-width: 576px) {
+
+  .sm\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+
+  .md\:flex-no-wrap {
+    flex-wrap: nowrap;
+  }
+
+  .md\:flex-1 {
+    flex: 1 1 0%;
+  }
+
+  .md\:h-12 {
+    height: 3rem;
+  }
+
+  .md\:px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .md\:w-auto {
+    width: auto;
+  }
+
+  .md\:w-3\/4 {
+    width: 75%;
+  }
 }

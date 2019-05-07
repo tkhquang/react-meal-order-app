@@ -23,22 +23,17 @@ class MenuPage extends Component {
     this.setState({
       loading: true
     });
-    axios
-      .get("http://localhost:8000/menus")
+    axios({
+      method: "get",
+      url: `${process.env.REACT_APP_API}/menus`,
+      headers: {
+        access_token: this.props.user.access_token
+      }
+    })
       .then(res => {
-        if (res.status !== 200) {
-          this.setState({
-            loading: false,
-            error: {
-              status: true,
-              message: "Invalid Response from Server"
-            }
-          });
-          return;
-        }
         this.setState({
           loading: false,
-          data: res.data
+          data: { ...res.data }
         });
       })
       .catch(err => {
@@ -48,7 +43,9 @@ class MenuPage extends Component {
             error: {
               status: true,
               code: err.response.status,
-              message: err.response.data.message
+              message: err.response.data.error
+                ? err.response.data.error.message
+                : err.response.data
             }
           });
           return;
@@ -68,22 +65,17 @@ class MenuPage extends Component {
   }
 
   render() {
-    return (
-      <>
-        {this.state.loading ? (
-          <InpageLoading />
-        ) : false ? ( // this.state.error.status
-          <ErrorPage
-            text="fetching data"
-            code={this.state.error.code}
-            message={this.state.error.message}
-          />
-        ) : false ? ( // !Object.keys(this.state.data).length === 0
-          <Overview />
-        ) : (
-          <AddMenu user={this.props.user} getMenu={this.getMenu} />
-        )}
-      </>
+    return this.state.loading ? (
+      <InpageLoading />
+    ) : this.state.error.status ? (
+      <ErrorPage
+        code={this.state.error.code}
+        message={this.state.error.message}
+      />
+    ) : Object.keys(this.state.data).length > 0 ? (
+      <Overview />
+    ) : (
+      <AddMenu user={this.props.user} getMenu={this.getMenu} />
     );
   }
 }

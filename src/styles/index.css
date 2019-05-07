@@ -36,3 +36,11 @@
 .img-fit {
   @apply block object-cover m-auto rounded-full;
 }
+
+.default-input {
+  @apply block text-grey-darker default-border rounded leading-tight bg-white shadow-none;
+}
+
+.default-input:focus {
+  @apply outline-none bg-grey-lighter;
+}

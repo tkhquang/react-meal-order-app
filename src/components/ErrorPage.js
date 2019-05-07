@@ -46,10 +46,7 @@ class ErrorPage extends Component {
           onMouseEnter={this.handleMouseEnter}
           onMouseLeave={this.handleMouseLeave}
         >
-          <FontAwesomeIcon
-            icon={faSync}
-            spin={this.state.isHovering ? true : false}
-          />
+          <FontAwesomeIcon icon={faSync} spin={this.state.isHovering} />
         </button>
       </main>
     );
