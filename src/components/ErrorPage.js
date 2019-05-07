@@ -38,15 +38,19 @@ class ErrorPage extends Component {
         {this.props.message && (
           <p className="my-4"> Message: {this.props.message} </p>
         )}
-        <FontAwesomeIcon
-          className="text-5xl my-4 cursor-pointer"
-          icon={faSync}
+        <button
+          type="button"
+          className="text-5xl text-red my-4 cursor-pointer"
           onClick={() => window.location.reload()}
           title="Reload!"
           onMouseEnter={this.handleMouseEnter}
           onMouseLeave={this.handleMouseLeave}
-          spin={this.state.isHovering ? true : false}
-        />
+        >
+          <FontAwesomeIcon
+            icon={faSync}
+            spin={this.state.isHovering ? true : false}
+          />
+        </button>
       </main>
     );
   }

@@ -39,6 +39,7 @@ class UserPanel extends Component {
         </div>
         <div className="bg-grey h-px mx-1" />
         <button
+          type="button"
           className="inline-block py-3 w-full m-auto text-black hover:bg-grey-light disabled:bg-grey disabled:cursor-not-allowed"
           onClick={this.handleLogOutClick}
           title="Logout"
@@ -46,9 +47,9 @@ class UserPanel extends Component {
           {this.state.loading ? (
             <FontAwesomeIcon icon={faSpinner} spin />
           ) : (
-            <>
+            <span>
               <FontAwesomeIcon icon={faSignOutAlt} /> Logout
-            </>
+            </span>
           )}
         </button>
       </div>

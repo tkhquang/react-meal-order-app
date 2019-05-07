@@ -26,7 +26,7 @@ const Header = props => {
         <h1 className="text-blue-dark mx-2 select-none">Datcom</h1>
       </div>
       <div className="relative inline-block h-full" ref={ref}>
-        <button className="px-5 h-full" onClick={toggle}>
+        <button type="button" className="px-5 h-full" onClick={toggle}>
           <img
             src={props.user.imageUrl}
             className="img-fit bg-grey-light w-10 h-10 default-border"

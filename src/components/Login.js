@@ -33,7 +33,7 @@ class Login extends Component {
             tag="button"
             className="btn"
             title="Login With Google"
-            disabled={this.state.loading ? true : false}
+            disabled={this.state.loading}
             onRequest={() => {
               this.setState({
                 loading: true,
@@ -54,13 +54,13 @@ class Login extends Component {
             }}
           >
             {this.state.loading ? (
-              <>
+              <span>
                 <FontAwesomeIcon icon={faSpinner} spin /> Logging In...
-              </>
+              </span>
             ) : (
-              <>
+              <span>
                 <FontAwesomeIcon icon={faGoogle} /> Login with Google
-              </>
+              </span>
             )}
           </CustomGoogleLogin>
         </div>
