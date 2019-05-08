@@ -5,7 +5,7 @@ const OverviewQuantity = props => {
     <table className="table-auto w-full p-4 default-border">
       <tbody>
         {props.items
-          .filter(item => item.users.length > 0)
+          .filter(item => item.users)
           .map(item => (
             <tr key={item.item_name}>
               <td className="p-2 md:px-10 text-left">{item.item_name}</td>
@@ -17,7 +17,9 @@ const OverviewQuantity = props => {
         <tr>
           <td className="p-2 md:px-10 text-left">Total:</td>
           <td className="p-2 md:px-10 text-left">
-            {props.items.reduce((a, b) => a + b.users.length, 0)}
+            {props.items
+              .filter(item => item.users)
+              .reduce((a, b) => b.users && a + b.users.length, 0)}
           </td>
         </tr>
       </tfoot>

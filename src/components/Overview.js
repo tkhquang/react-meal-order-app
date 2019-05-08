@@ -34,13 +34,16 @@ class Overview extends Component {
     });
     axios({
       method: "get",
-      url: `http://localhost:8000/menus/${
+      url: `${process.env.REACT_APP_API}/menus/${
         this.props.data.menu.id
-      }/people_in_charge`
+      }/people-in-charge`,
+      headers: {
+        access_token: this.props.user.access_token
+      }
     })
       .then(() => {
-        this.props.reFetchMenu().then(() => {
-          if (!this.props.reFetchRes) {
+        this.props.reFetchMenu().then(err => {
+          if (err) {
             this.setState({
               loading: false,
               message: {
@@ -62,28 +65,14 @@ class Overview extends Component {
         });
       })
       .catch(() => {
-        // this.setState({
-        //   loading: false,
-        //   message: {
-        //     ele: "summary",
-        //     body: "Failed to get PIC!",
-        //     type: "error"
-        //   }
-        // });
-
-        // Testing
-        setTimeout(() => {
-          this.props.reFetchMenu().then(() => {
-            this.setState({
-              loading: false,
-              message: {
-                ele: "",
-                body: "",
-                type: ""
-              }
-            });
-          });
-        }, 2000);
+        this.setState({
+          loading: false,
+          message: {
+            ele: "summary",
+            body: "Failed to get PIC!",
+            type: "error"
+          }
+        });
       });
   };
 
@@ -110,7 +99,12 @@ class Overview extends Component {
     });
     axios({
       method: "post",
-      url: `http://localhost:8000/menus/${this.props.data.menu.id}/items`,
+      url: `${process.env.REACT_APP_API}/menus/${
+        this.props.data.menu.id
+      }/items`,
+      headers: {
+        access_token: this.props.user.access_token
+      },
       data: JSON.stringify({ item_name: itemName })
     })
       .then(() => {
@@ -125,26 +119,14 @@ class Overview extends Component {
         this.props.reFetchMenu();
       })
       .catch(() => {
-        // this.setState({
-        //   loading: false,
-        //   message: {
-        //     ele: "topMsg",
-        //     body: "Failed to add item!",
-        //     type: "error"
-        //   }
-        // });
-
-        // Testing
-        setTimeout(() => {
-          this.setState({
-            loading: false,
-            message: {
-              ele: "topMsg",
-              body: "Failed to add item!",
-              type: "error"
-            }
-          });
-        }, 2000);
+        this.setState({
+          loading: false,
+          message: {
+            ele: "topMsg",
+            body: "Failed to add item!",
+            type: "error"
+          }
+        });
       });
   };
 
@@ -160,7 +142,10 @@ class Overview extends Component {
 
     axios({
       method: "delete",
-      url: `http://localhost:8000/menus/${this.props.menuID}/items/${id}`
+      url: `${process.env.REACT_APP_API}/items/${id}`,
+      headers: {
+        access_token: this.props.user.access_token
+      }
     })
       .then(() => {
         this.setState({
@@ -186,7 +171,7 @@ class Overview extends Component {
   };
 
   modifyMenuTime = (ele, time) => {
-    let timeName = ele === "deadline" ? "deadline" : "remind to pay time";
+    const timeName = ele === "deadline" ? "deadline" : "remind to pay time";
     this.setState({
       loading: true,
       message: {
@@ -197,10 +182,13 @@ class Overview extends Component {
     });
     axios({
       method: "post",
-      url: `http://localhost:8000/menus/${this.props.data.menu.id}/time`,
+      url: `${process.env.REACT_APP_API}/menus/${this.props.data.menu.id}/time`,
+      headers: {
+        access_token: this.props.user.access_token
+      },
       data: JSON.stringify({ [ele]: time })
     })
-      .then(res => {
+      .then(() => {
         this.setState({
           loading: false,
           message: {
@@ -211,26 +199,14 @@ class Overview extends Component {
         });
       })
       .catch(() => {
-        // this.setState({
-        //   loading: false,
-        //   message: {
-        //     ele: ele,
-        //     body: `Modify ${timeName} failed!`,
-        //     type: "error"
-        //   }
-        // });
-
-        // Testing
-        setTimeout(() => {
-          this.setState({
-            loading: false,
-            message: {
-              ele: ele,
-              body: `Modify ${timeName} failed!`,
-              type: "error"
-            }
-          });
-        }, 2000);
+        this.setState({
+          loading: false,
+          message: {
+            ele: ele,
+            body: `Modify ${timeName} failed!`,
+            type: "error"
+          }
+        });
       });
   };
 
@@ -274,9 +250,8 @@ class Overview extends Component {
             {getStringDate(new Date(), "/")}
           </h1>
         </div>
-
         <form
-          className="w-4/5 flex items-center flex-wrap md:flex-no-wrap"
+          className="w-4/5 my-2 flex items-center flex-wrap md:flex-no-wrap"
           action=""
           onSubmit={this.handleAddItem}
         >
@@ -348,7 +323,7 @@ class Overview extends Component {
             />
           )}
           <button
-            className="btn sm:px-6 md:px-8"
+            className="btn-small h-10 sm:px-6 md:px-8"
             type="button"
             disabled={this.state.loading}
             onClick={this.handleSummary}
@@ -356,26 +331,26 @@ class Overview extends Component {
             Summary
           </button>
         </div>
-        {data.people_in_charge.length > 0 && (
-          <div className="w-4/5">
+        {data.people_in_charge && (
+          <div className="w-4/5 my-2">
             <OverviewQuantity items={data.items} />
             <div className="text-right">
               <CopyToClipboard
                 text={data.items
-                  .filter(item => item.users.length > 0)
+                  .filter(item => item.users)
                   .map(item => `${item.item_name}: ${item.users.length}\n`)
                   .join("")}
                 onCopy={this.handleCopy}
               >
                 <button
                   type="button"
-                  className="btn-copy default-border px-5 py-3 my-3 sm:px-6 md:px-8"
+                  className="btn-copy default-border px-5 h-10 my-4 md:px-8"
                 >
                   {this.state.copied ? "Copied!" : "Copy"}
                 </button>
               </CopyToClipboard>
             </div>
-            <div className="my-4 text-right">
+            <div className="text-right pb-4">
               <p className="">
                 People in charge:{" "}
                 {data.people_in_charge.map(user => user.user_name).join(", ")}

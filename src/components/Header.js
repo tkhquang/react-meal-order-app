@@ -17,7 +17,7 @@ const Header = props => {
     return () => document.removeEventListener("mousedown", handleClick);
   });
   return (
-    <header className="sticky pin-t pin-l pin-r flex px-5 justify-between items-center h-12 shadow-md z-40">
+    <header className="sticky bg-white pin-t pin-l pin-r flex px-5 justify-between items-center h-12 shadow-md z-40">
       <div
         className="inline-flex justify-center items-center cursor-pointer"
         onClick={() => window.location.reload()}

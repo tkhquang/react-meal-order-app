@@ -17,11 +17,12 @@ const OverviewTable = props => {
         {props.data.items.map(item => (
           <Fragment key={item.id}>
             <tr className="border-2 border-blue-light">
-              <td className="text-left md:px-10 p-2 w-1/5">{item.item_name}</td>
-              <td className="text-left md:px-10 p-2 w-1/2">
-                {item.users.map(user => user.name).join(", ")}
+              <td className="text-left md:px-10 p-2 w-1/4">{item.item_name}</td>
+              <td className="text-left md:px-10 p-2 w-1/3">
+                {item.users &&
+                  item.users.map(user => user.user_name).join(", ")}
               </td>
-              <td className="py-2">{item.users.length}</td>
+              <td className="py-2">{item.users ? item.users.length : 0}</td>
               <td className="p-2">
                 <button
                   type="button"

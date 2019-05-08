@@ -13,7 +13,7 @@ const InpageMessage = props => {
           <FontAwesomeIcon icon={faExclamationCircle} /> {props.message.body}
         </span>
       ) : props.message.type === "success" ? (
-        <span className="text-red font-bold">
+        <span className="text-green font-bold">
           <FontAwesomeIcon icon={faCheckCircle} /> {props.message.body}
         </span>
       ) : (
