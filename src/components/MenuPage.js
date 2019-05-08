@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import axios from "axios";
+import request from "../utils/request";
 import InpageLoading from "./InpageLoading";
+import LoadingProgress from "./LoadingProgress";
 import Overview from "./Overview";
 import AddMenu from "./AddMenu";
 import ErrorPage from "./ErrorPage";
@@ -10,6 +11,7 @@ class MenuPage extends Component {
     super(props);
     this.state = {
       loading: true,
+      refetching: false,
       data: null,
       error: {
         status: false,
@@ -20,19 +22,20 @@ class MenuPage extends Component {
   }
 
   reFetchMenu = async () => {
+    this.setState({
+      refetching: true
+    });
     try {
-      const res = await axios({
-        method: "get",
-        url: `${process.env.REACT_APP_API}/menus`,
-        headers: {
-          access_token: this.props.user.access_token
-        }
-      });
+      const res = await request.get("/menus");
       this.setState({
+        refetching: false,
         data: { ...res.data }
       });
       return false;
     } catch (err) {
+      this.setState({
+        refetching: false
+      });
       return err;
     }
   };
@@ -41,13 +44,8 @@ class MenuPage extends Component {
     this.setState({
       loading: true
     });
-    axios({
-      method: "get",
-      url: `${process.env.REACT_APP_API}/menus`,
-      headers: {
-        access_token: this.props.user.access_token
-      }
-    })
+    request
+      .get("/menus")
       .then(res => {
         this.setState({
           loading: false,
@@ -83,21 +81,22 @@ class MenuPage extends Component {
   }
 
   render() {
-    return this.state.loading ? (
-      <InpageLoading />
-    ) : this.state.error.status ? (
-      <ErrorPage
-        code={this.state.error.code}
-        message={this.state.error.message}
-      />
-    ) : Object.keys(this.state.data).length > 0 ? (
-      <Overview
-        user={this.props.user}
-        data={this.state.data}
-        reFetchMenu={this.reFetchMenu}
-      />
-    ) : (
-      <AddMenu user={this.props.user} getMenu={this.getMenu} />
+    return (
+      <>
+        {this.state.loading ? (
+          <InpageLoading />
+        ) : this.state.error.status ? (
+          <ErrorPage
+            code={this.state.error.code}
+            message={this.state.error.message}
+          />
+        ) : Object.keys(this.state.data).length > 0 ? (
+          <Overview data={this.state.data} reFetchMenu={this.reFetchMenu} />
+        ) : (
+          <AddMenu userID={this.props.userID} getMenu={this.getMenu} />
+        )}
+        {this.state.refetching && <LoadingProgress />}
+      </>
     );
   }
 }

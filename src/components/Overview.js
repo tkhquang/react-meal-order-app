@@ -1,23 +1,23 @@
 import React, { Component } from "react";
-import axios from "axios";
+import request from "../utils/request";
 import { getStringDate } from "../helpers";
+import Button from "./Button";
+import AddItem from "./AddItem";
 import OverviewTable from "./OverviewTable";
+import OverviewDeadline from "./OverviewDeadline";
+import OverviewRemind from "./OverviewRemind";
 import OverviewQuantity from "./OverviewQuantity";
-import InpageMessage from "./InpageMessage";
-import TimeContainer from "./TimeContainer";
+import LoadingProgress from "./LoadingProgress";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { withAlert } from "react-alert";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 class Overview extends Component {
   constructor(props) {
     super(props);
-    this.addItemRef = React.createRef();
     this.state = {
       loading: false,
-      message: {
-        ele: "",
-        body: "",
-        type: ""
-      },
       copied: false
     };
   }
@@ -25,209 +25,31 @@ class Overview extends Component {
   handleSummary = e => {
     e.preventDefault();
     this.setState({
-      loading: true,
-      message: {
-        ele: "summary",
-        body: "Summarizing...",
-        type: "loading"
-      }
+      loading: true
     });
-    axios({
-      method: "get",
-      url: `${process.env.REACT_APP_API}/menus/${
-        this.props.data.menu.id
-      }/people-in-charge`,
-      headers: {
-        access_token: this.props.user.access_token
-      }
-    })
+    request
+      .get(`/menus/${this.props.data.menu.id}/people-in-charge`)
       .then(() => {
         this.props.reFetchMenu().then(err => {
           if (err) {
             this.setState({
-              loading: false,
-              message: {
-                ele: "summary",
-                body: "Error, please try again!",
-                type: "error"
-              }
+              loading: false
             });
+            this.showAlert(false, "Failed to refetch menu!");
             return;
           }
           this.setState({
-            loading: false,
-            message: {
-              ele: "",
-              body: "",
-              type: ""
-            }
+            loading: false
           });
+          this.showAlert(true, "Summarized menu successfully!");
         });
       })
       .catch(() => {
         this.setState({
-          loading: false,
-          message: {
-            ele: "summary",
-            body: "Failed to get PIC!",
-            type: "error"
-          }
+          loading: false
         });
+        this.showAlert(false, "Failed to get PIC!");
       });
-  };
-
-  handleAddItem = e => {
-    e.preventDefault();
-    const itemName = this.addItemRef.current.value.trim();
-    if (!itemName) {
-      this.setState({
-        message: {
-          ele: "topMsg",
-          body: "This field cannot be empty!",
-          type: "error"
-        }
-      });
-      return;
-    }
-    this.setState({
-      loading: true,
-      message: {
-        ele: "topMsg",
-        body: "Adding Item...",
-        type: "loading"
-      }
-    });
-    axios({
-      method: "post",
-      url: `${process.env.REACT_APP_API}/menus/${
-        this.props.data.menu.id
-      }/items`,
-      headers: {
-        access_token: this.props.user.access_token
-      },
-      data: JSON.stringify({ item_name: itemName })
-    })
-      .then(() => {
-        this.setState({
-          loading: false,
-          message: {
-            ele: "topMsg",
-            body: "Added item successfully!",
-            type: "success"
-          }
-        });
-        this.props.reFetchMenu();
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-          message: {
-            ele: "topMsg",
-            body: "Failed to add item!",
-            type: "error"
-          }
-        });
-      });
-  };
-
-  handleDelete = id => {
-    this.setState({
-      loading: true,
-      message: {
-        ele: "topMsg",
-        body: "Deleting Item...",
-        type: "loading"
-      }
-    });
-
-    axios({
-      method: "delete",
-      url: `${process.env.REACT_APP_API}/items/${id}`,
-      headers: {
-        access_token: this.props.user.access_token
-      }
-    })
-      .then(() => {
-        this.setState({
-          loading: false,
-          message: {
-            ele: "topMsg",
-            body: "Item deleted successfully!",
-            type: "success"
-          }
-        });
-        this.props.reFetchMenu();
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-          message: {
-            ele: "topMsg",
-            body: "Failed to delete item!",
-            type: "error"
-          }
-        });
-      });
-  };
-
-  modifyMenuTime = (ele, time) => {
-    const timeName = ele === "deadline" ? "deadline" : "remind to pay time";
-    this.setState({
-      loading: true,
-      message: {
-        ele: ele,
-        body: "Sending request...",
-        type: "loading"
-      }
-    });
-    axios({
-      method: "post",
-      url: `${process.env.REACT_APP_API}/menus/${this.props.data.menu.id}/time`,
-      headers: {
-        access_token: this.props.user.access_token
-      },
-      data: JSON.stringify({ [ele]: time })
-    })
-      .then(() => {
-        this.setState({
-          loading: false,
-          message: {
-            ele: ele,
-            body: `Modify ${timeName} successfully!`,
-            type: "success"
-          }
-        });
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-          message: {
-            ele: ele,
-            body: `Modify ${timeName} failed!`,
-            type: "error"
-          }
-        });
-      });
-  };
-
-  handleDeadlineChange = time => {
-    if (
-      new Date(this.props.data.menu.deadline).getTime() ===
-      new Date(time).getTime()
-    ) {
-      return;
-    }
-    this.modifyMenuTime("deadline", time);
-  };
-
-  handleRemindChange = time => {
-    if (
-      new Date(this.props.data.menu.payment_reminder).getTime() ===
-      new Date(time).getTime()
-    ) {
-      return;
-    }
-    this.modifyMenuTime("payment_reminder", time);
   };
 
   handleCopy = () => {
@@ -241,8 +63,16 @@ class Overview extends Component {
     }, 1000);
   };
 
+  showAlert = (success, message) => {
+    if (success) {
+      this.props.alert.success(message);
+      return;
+    }
+    this.props.alert.error(message);
+  };
+
   render() {
-    const { data } = this.props;
+    const { data, reFetchMenu } = this.props;
     return (
       <main className="flex-col-full">
         <div className="w-4/5">
@@ -250,88 +80,45 @@ class Overview extends Component {
             {getStringDate(new Date(), "/")}
           </h1>
         </div>
-        <form
-          className="w-4/5 my-2 flex items-center flex-wrap md:flex-no-wrap"
-          action=""
-          onSubmit={this.handleAddItem}
-        >
-          <label htmlFor="add-item" className="mr-2 w-full md:w-auto">
-            Add Item:{" "}
-          </label>
-          <input
-            id="add-item"
-            className="h-10 mr-2 md:mx-2 w-1/2 md:w-1/3 px-2 appearance-none default-input"
-            type="text"
-            placeholder="Add one item..."
-            ref={this.addItemRef}
-            required
-          />
-          <button
-            className="btn-small ml-2 sm:px-6 md:px-8"
-            type="submit"
-            disabled={this.state.loading}
-          >
-            Submit
-          </button>
-          {this.state.message.ele === "topMsg" && (
-            <InpageMessage
-              classes="flex-grow flex-no-shrink text-center w-full md:w-auto"
-              message={this.state.message}
-            />
-          )}
-        </form>
+        <AddItem
+          menuID={data.menu.id}
+          reFetchMenu={reFetchMenu}
+          showAlert={this.showAlert}
+        />
         <div className="flex-center w-4/5">
           <OverviewTable
             data={data}
-            handleDelete={this.handleDelete}
-            disabled={this.state.loading}
+            reFetchMenu={reFetchMenu}
+            showAlert={this.showAlert}
           />
         </div>
-        <div className="flex flex-wrap w-4/5 items-center">
-          <div className="w-full md:w-1/2 my-2 text-center">
-            {this.state.message.ele === "deadline" && (
-              <InpageMessage classes="" message={this.state.message} />
-            )}
-          </div>
-          <TimeContainer
-            id="deadline-input"
-            textLabel="Deadline:"
-            default={new Date(data.menu.deadline)}
-            onChange={this.handleDeadlineChange}
-            labelClassName="w-1/2 md:w-1/4 my-2"
-            inputClassName="w-1/2 md:w-1/4 min-w-24 my-2 default-border"
+        <div className="flex flex-col flex-wrap w-4/5 items-end">
+          <OverviewDeadline
+            menu={data.menu}
+            reFetchMenu={reFetchMenu}
+            showAlert={this.showAlert}
           />
-          <div className="w-full md:w-1/2 my-2 text-center">
-            {this.state.message.ele === "payment_reminder" && (
-              <InpageMessage classes="" message={this.state.message} />
-            )}
-          </div>
-          <TimeContainer
-            id="remind-input"
-            textLabel="Remind to pay:"
-            default={new Date(data.menu.payment_reminder)}
-            onChange={this.handleRemindChange}
-            labelClassName="w-1/2 md:w-1/4 my-2"
-            inputClassName="w-1/2 md:w-1/4 min-w-24 my-2 default-border"
+          <OverviewRemind
+            menu={data.menu}
+            reFetchMenu={reFetchMenu}
+            showAlert={this.showAlert}
           />
         </div>
         <div className="flex w-4/5 items-center justify-end">
-          {this.state.message.ele === "summary" && (
-            <InpageMessage
-              classes="w-auto my-2 mx-auto"
-              message={this.state.message}
-            />
-          )}
-          <button
-            className="btn-small h-10 sm:px-6 md:px-8"
-            type="button"
+          <Button
+            classes="btn-small h-10 sm:px-6 md:px-8"
             disabled={this.state.loading}
+            type="button"
+            defaultText="Summary"
+            disabledText={
+              <span>
+                <FontAwesomeIcon icon={faSpinner} spin /> Summarizing...
+              </span>
+            }
             onClick={this.handleSummary}
-          >
-            Summary
-          </button>
+          />
         </div>
-        {data.people_in_charge && (
+        {data.people_in_charge && data.items && (
           <div className="w-4/5 my-2">
             <OverviewQuantity items={data.items} />
             <div className="text-right">
@@ -352,15 +139,18 @@ class Overview extends Component {
             </div>
             <div className="text-right pb-4">
               <p className="">
-                People in charge:{" "}
+                {data.people_in_charge.length > 1
+                  ? "People in charge: "
+                  : "Person in charge: "}
                 {data.people_in_charge.map(user => user.user_name).join(", ")}
               </p>
             </div>
           </div>
         )}
+        {this.state.loading && <LoadingProgress />}
       </main>
     );
   }
 }
 
-export default Overview;
+export default withAlert()(Overview);
