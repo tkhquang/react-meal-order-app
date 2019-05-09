@@ -1,0 +1,59 @@
+@tailwind preflight;
+@tailwind components;
+@tailwind utilities;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.btn {
+  @apply px-5 py-3 my-3 text-white text-lg bg-blue-dark rounded shadow transition;
+}
+
+.btn-small {
+  @apply px-5 my-3 h-10 text-white text-lg bg-blue-dark rounded shadow transition;
+}
+
+.btn-copy {
+  @apply text-black text-lg bg-white rounded shadow transition;
+}
+
+.btn:hover,
+.btn:focus,
+.btn-small:hover,
+.btn-small:focus,
+.btn-copy:hover,
+.btn-copy:focus {
+  @apply bg-blue-light;
+}
+
+.btn:disabled,
+.btn-small:disabled {
+  @apply bg-grey cursor-not-allowed;
+}
+
+.flex-col-full {
+  @apply flex flex-col w-full justify-center items-center;
+}
+
+.flex-center {
+  @apply flex justify-center items-center;
+}
+
+.default-border {
+  @apply border-2 border-blue-light;
+}
+
+.img-fit {
+  @apply block object-cover m-auto rounded-full;
+}
+
+.default-input {
+  @apply block text-grey-darker default-border rounded leading-tight bg-white shadow-none;
+}
+
+.default-input:focus {
+  @apply outline-none bg-grey-lighter;
+}
