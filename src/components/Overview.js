@@ -38,6 +38,15 @@ class Overview extends Component {
             this.showAlert(false, "Failed to refetch menu!");
             return;
           }
+          if (
+            !this.props.data.menu.items ||
+            this.props.data.menu.items
+              .filter(item => item.users)
+              .reduce((a, b) => b.users && a + b.users.length, 0) === 0
+          ) {
+            this.showAlert(false, "No items or orders to summarize!");
+            return;
+          }
           this.showAlert(true, "Summarized menu successfully!");
         });
       })
@@ -115,35 +124,39 @@ class Overview extends Component {
             onClick={this.handleSummary}
           />
         </div>
-        {data.people_in_charge && data.items && (
-          <div className="w-4/5 my-2">
-            <OverviewQuantity items={data.items} />
-            <div className="text-right">
-              <CopyToClipboard
-                text={data.items
-                  .filter(item => item.users)
-                  .map(item => `${item.item_name}: ${item.users.length}\n`)
-                  .join("")}
-                onCopy={this.handleCopy}
-              >
-                <button
-                  type="button"
-                  className="btn-copy default-border px-5 h-10 my-4 md:px-8"
+        {data.people_in_charge &&
+          data.items &&
+          data.items
+            .filter(item => item.users)
+            .reduce((a, b) => b.users && a + b.users.length, 0) !== 0 && (
+            <div className="w-4/5 my-2">
+              <OverviewQuantity items={data.items} />
+              <div className="text-right">
+                <CopyToClipboard
+                  text={data.items
+                    .filter(item => item.users)
+                    .map(item => `${item.item_name}: ${item.users.length}\n`)
+                    .join("")}
+                  onCopy={this.handleCopy}
                 >
-                  {this.state.copied ? "Copied!" : "Copy"}
-                </button>
-              </CopyToClipboard>
+                  <button
+                    type="button"
+                    className="btn-copy default-border px-5 h-10 my-4 md:px-8"
+                  >
+                    {this.state.copied ? "Copied!" : "Copy"}
+                  </button>
+                </CopyToClipboard>
+              </div>
+              <div className="text-right pb-4">
+                <p className="">
+                  {data.people_in_charge.length > 1
+                    ? "People in charge: "
+                    : "Person in charge: "}
+                  {data.people_in_charge.map(user => user.user_name).join(", ")}
+                </p>
+              </div>
             </div>
-            <div className="text-right pb-4">
-              <p className="">
-                {data.people_in_charge.length > 1
-                  ? "People in charge: "
-                  : "Person in charge: "}
-                {data.people_in_charge.map(user => user.user_name).join(", ")}
-              </p>
-            </div>
-          </div>
-        )}
+          )}
         {this.state.loading && <LoadingProgress />}
       </main>
     );
