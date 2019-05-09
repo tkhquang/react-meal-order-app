@@ -66,7 +66,7 @@ a {
  * Add the correct font weight in Chrome, Edge, and Safari.
  */
 
-
+b,
 strong {
   font-weight: bolder;
 }
@@ -271,6 +271,10 @@ textarea {
  * Add the correct display in IE 10+.
  */
 
+template {
+  display: none;
+}
+
 /**
  * Add the correct display in IE 10.
  */
@@ -385,6 +389,16 @@ button,
   cursor: pointer;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+.appearance-none {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+
 .bg-grey {
   background-color: #b8c2cc;
 }
@@ -397,12 +411,24 @@ button,
   background-color: #f8fafc;
 }
 
+.bg-white {
+  background-color: #fff;
+}
+
 .hover\:bg-grey-light:hover {
   background-color: #dae1e7;
 }
 
 .disabled\:bg-grey:disabled {
   background-color: #b8c2cc;
+}
+
+.border-blue-light {
+  border-color: #6cb2eb;
+}
+
+.border-2 {
+  border-width: 2px;
 }
 
 .cursor-pointer {
@@ -421,6 +447,10 @@ button,
   display: inline-block;
 }
 
+.table {
+  display: table;
+}
+
 .flex {
   display: flex;
 }
@@ -429,8 +459,16 @@ button,
   display: inline-flex;
 }
 
+.flex-col {
+  flex-direction: column;
+}
+
 .flex-wrap {
   flex-wrap: wrap;
+}
+
+.items-end {
+  align-items: flex-end;
 }
 
 .items-center {
@@ -455,6 +493,10 @@ button,
 
 .font-medium {
   font-weight: 500;
+}
+
+.font-bold {
+  font-weight: 700;
 }
 
 .h-6 {
@@ -527,6 +569,10 @@ button,
   margin-right: auto;
 }
 
+.mr-2 {
+  margin-right: .5rem;
+}
+
 .ml-2 {
   margin-left: .5rem;
 }
@@ -547,8 +593,26 @@ button,
   min-width: 6rem;
 }
 
+.p-2 {
+  padding: .5rem;
+}
+
 .p-3 {
   padding: .75rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.py-2 {
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+}
+
+.px-2 {
+  padding-left: .5rem;
+  padding-right: .5rem;
 }
 
 .py-3 {
@@ -574,6 +638,10 @@ button,
 .px-12 {
   padding-left: 3rem;
   padding-right: 3rem;
+}
+
+.pb-4 {
+  padding-bottom: 1rem;
 }
 
 .absolute {
@@ -609,8 +677,20 @@ button,
   box-shadow: 0 15px 30px 0 rgba(0, 0, 0, .11), 0 5px 15px 0 rgba(0, 0, 0, .08);
 }
 
+.table-auto {
+  table-layout: auto;
+}
+
+.text-left {
+  text-align: left;
+}
+
 .text-center {
   text-align: center;
+}
+
+.text-right {
+  text-align: right;
 }
 
 .text-black {
@@ -631,6 +711,14 @@ button,
 
 .text-blue-dark {
   color: #2779bd;
+}
+
+.hover\:text-grey-dark:hover {
+  color: #8795a1;
+}
+
+.disabled\:text-grey:disabled {
+  color: #b8c2cc;
 }
 
 .text-sm {
@@ -681,6 +769,14 @@ button,
   width: 50%;
 }
 
+.w-1\/3 {
+  width: 33.33333%;
+}
+
+.w-1\/4 {
+  width: 25%;
+}
+
 .w-4\/5 {
   width: 80%;
 }
@@ -697,6 +793,10 @@ button,
   z-index: 50;
 }
 
+.transition {
+  transition: all .3s ease;
+}
+
 *,
 *::before,
 *::after {
@@ -708,22 +808,50 @@ button,
   padding-right: 1.25rem;
   padding-top: .75rem;
   padding-bottom: .75rem;
-  color: #fff;
-  font-size: 1.125rem;
   margin-top: .75rem;
   margin-bottom: .75rem;
+  color: #fff;
+  font-size: 1.125rem;
   background-color: #2779bd;
   border-radius: .25rem;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
   transition: all .3s ease;
 }
 
+.btn-small {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  margin-top: .75rem;
+  margin-bottom: .75rem;
+  height: 2.5rem;
+  color: #fff;
+  font-size: 1.125rem;
+  background-color: #2779bd;
+  border-radius: .25rem;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+  transition: all .3s ease;
+}
+
+.btn-copy {
+  color: #22292f;
+  font-size: 1.125rem;
+  background-color: #fff;
+  border-radius: .25rem;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+  transition: all .3s ease;
+}
+
 .btn:hover,
-.btn:focus {
+.btn:focus,
+.btn-small:hover,
+.btn-small:focus,
+.btn-copy:hover,
+.btn-copy:focus {
   background-color: #6cb2eb;
 }
 
-.btn:disabled {
+.btn:disabled,
+.btn-small:disabled {
   background-color: #b8c2cc;
   cursor: not-allowed;
 }
@@ -792,13 +920,31 @@ button,
     height: 3rem;
   }
 
+  .md\:mx-2 {
+    margin-left: .5rem;
+    margin-right: .5rem;
+  }
+
   .md\:px-8 {
     padding-left: 2rem;
     padding-right: 2rem;
   }
 
+  .md\:px-10 {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+
   .md\:w-auto {
     width: auto;
+  }
+
+  .md\:w-1\/2 {
+    width: 50%;
+  }
+
+  .md\:w-1\/3 {
+    width: 33.33333%;
   }
 
   .md\:w-3\/4 {

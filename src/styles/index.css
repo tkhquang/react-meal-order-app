@@ -9,15 +9,28 @@
 }
 
 .btn {
-  @apply px-5 py-3 text-white text-lg my-3 bg-blue-dark rounded shadow transition;
+  @apply px-5 py-3 my-3 text-white text-lg bg-blue-dark rounded shadow transition;
+}
+
+.btn-small {
+  @apply px-5 my-3 h-10 text-white text-lg bg-blue-dark rounded shadow transition;
+}
+
+.btn-copy {
+  @apply text-black text-lg bg-white rounded shadow transition;
 }
 
 .btn:hover,
-.btn:focus {
+.btn:focus,
+.btn-small:hover,
+.btn-small:focus,
+.btn-copy:hover,
+.btn-copy:focus {
   @apply bg-blue-light;
 }
 
-.btn:disabled {
+.btn:disabled,
+.btn-small:disabled {
   @apply bg-grey cursor-not-allowed;
 }
 

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import axios from "axios";
+import request from "./utils/request";
 import Loading from "./components/Loading";
 import Login from "./components/Login";
 import Header from "./components/Header";
@@ -41,32 +41,31 @@ class App extends Component {
   };
 
   signInToGoogle = () => {
-    const userProfile = googleGetBasicProfil();
-    const userAuthRes = googleGetAuthResponse();
-    axios({
-      method: "get",
-      url: `${process.env.REACT_APP_API}/auth/google/callback`,
-      headers: {
-        id_token: userAuthRes.id_token
-      }
-    })
+    const { name, email, imageUrl } = googleGetBasicProfil();
+    const { id_token } = googleGetAuthResponse();
+    request
+      .get("/auth/google/callback", {
+        params: {
+          id_token
+        }
+      })
       .then(res => {
         this.setState({
-          loading: false,
           isAuthenticated: true,
           user: {
-            ...userProfile,
+            name,
+            email,
+            imageUrl,
             fortressName: res.data.name,
-            access_token: res.data.access_token,
             id: res.data.id
           }
         });
+        window.localStorage.setItem("token", res.data.authorization);
       })
       .catch(err => {
         this.signOut();
         if (err.response) {
           this.setState({
-            loading: false,
             error: {
               status: true,
               code: err.response.status,
@@ -78,36 +77,34 @@ class App extends Component {
           return;
         }
         this.setState({
-          loading: false,
           error: {
             status: true,
             message: "Network Error"
           }
+        });
+      })
+      .finally(() => {
+        this.setState({
+          loading: false
         });
       });
   };
 
   signOutOfGoogle = () => {
     if (this.state.user) {
-      axios({
-        method: "post",
-        url: `${process.env.REACT_APP_API}/auth/google/logout`,
-        headers: {
-          access_token: this.state.user.access_token
-        }
-      })
+      request
+        .post("/auth/google/logout")
         .then(() => {
           this.setState({
-            loading: false,
             isAuthenticated: false,
             user: null
           });
+          window.localStorage.removeItem("token");
           return;
         })
         .catch(err => {
           if (err.response) {
             this.setState({
-              loading: false,
               error: {
                 status: true,
                 code: err.response.status,
@@ -119,11 +116,15 @@ class App extends Component {
             return;
           }
           this.setState({
-            loading: false,
             error: {
               status: true,
               message: "Network Error"
             }
+          });
+        })
+        .finally(() => {
+          this.setState({
+            loading: false
           });
         });
       return;
@@ -133,6 +134,7 @@ class App extends Component {
       isAuthenticated: false,
       user: null
     });
+    window.localStorage.removeItem("token");
   };
 
   onUpdateSigninStatus = isSignIn => {
@@ -159,7 +161,7 @@ class App extends Component {
         ) : this.state.isAuthenticated ? (
           <>
             <Header user={this.state.user} signOut={this.signOut} />
-            <MenuPage user={this.state.user} />
+            <MenuPage userID={this.state.user.id} />
           </>
         ) : (
           <Login />

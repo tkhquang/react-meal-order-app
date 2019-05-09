@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import axios from "axios";
+import request from "../utils/request";
 import { getStringDate, getFormattedDate } from "../helpers";
 import Button from "./Button";
 import TimeContainer from "./TimeContainer";
@@ -10,9 +10,9 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 class AddMenu extends Component {
   constructor(props) {
     super(props);
-    this.listRef = React.createRef();
     this.state = {
       loading: false,
+      itemNames: "",
       deadline: getFormattedDate(new Date(), 10, 30, 0),
       remind: getFormattedDate(new Date(), 14, 30, 0),
       error: {
@@ -22,6 +22,12 @@ class AddMenu extends Component {
       }
     };
   }
+
+  handleItemNamesChange = e => {
+    this.setState({
+      itemNames: e.target.value
+    });
+  };
 
   handleDeadlineChange = time => {
     this.setState({
@@ -37,13 +43,22 @@ class AddMenu extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    const itemList = this.listRef.current.value
+    if (!this.state.itemNames.trim()) {
+      this.setState({
+        error: {
+          status: true,
+          message: "This field cannot be empty!"
+        }
+      });
+      return;
+    }
+    const itemList = this.state.itemNames
       .split(/[\r\n]+/)
       .map(item => item.trim())
       .filter(i => Boolean(i));
     const requestBody = {
       menu: {
-        owner_id: this.props.user.id,
+        owner_id: this.props.userID,
         name: `lunch_${getStringDate(new Date(), "_")}`,
         deadline: this.state.deadline,
         payment_reminder: this.state.remind
@@ -56,24 +71,14 @@ class AddMenu extends Component {
         status: false
       }
     });
-    axios({
-      method: "post",
-      url: `${process.env.REACT_APP_API}/menus`,
-      headers: {
-        access_token: this.props.user.access_token
-      },
-      data: JSON.stringify(requestBody)
-    })
+    request
+      .post("/menus", JSON.stringify(requestBody))
       .then(() => {
-        this.setState({
-          loading: false
-        });
         this.props.getMenu();
       })
       .catch(err => {
         if (err.response) {
           this.setState({
-            loading: false,
             error: {
               status: true,
               code: err.response.status,
@@ -85,11 +90,15 @@ class AddMenu extends Component {
           return;
         }
         this.setState({
-          loading: false,
           error: {
             status: true,
             message: "Network Error"
           }
+        });
+      })
+      .finally(() => {
+        this.setState({
+          loading: false
         });
       });
   };
@@ -110,12 +119,13 @@ class AddMenu extends Component {
               Add menu:
             </label>
             <textarea
-              ref={this.listRef}
               className="default-input w-full py-3 px-4 mb-3"
               name="list"
               cols="80"
               rows="12"
               placeholder="Add item list..."
+              value={this.state.itemNames}
+              onChange={this.handleItemNamesChange}
               required
             />
           </div>
@@ -125,7 +135,7 @@ class AddMenu extends Component {
               textLabel="Deadline:"
               value={this.state.deadline}
               onChange={this.handleDeadlineChange}
-              labelClassName="w-1/2 my-2 md:w-auto md:flex-1"
+              labelClassName="w-1/2 my-2 md:w-auto md:flex-1 text-center"
               inputClassName="w-1/2 min-w-24 my-2 md:w-auto md:flex-1 default-border"
             />
             <TimeContainer
@@ -133,7 +143,7 @@ class AddMenu extends Component {
               textLabel="Remind to pay:"
               value={this.state.remind}
               onChange={this.handleRemindChange}
-              labelClassName="w-1/2 my-2 md:w-auto md:flex-1"
+              labelClassName="w-1/2 my-2 md:w-auto md:flex-1 text-center"
               inputClassName="w-1/2 min-w-24 my-2 md:w-auto md:flex-1 default-border"
             />
           </div>

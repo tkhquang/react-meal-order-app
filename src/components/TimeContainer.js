@@ -12,8 +12,7 @@ const styles = {
     }
   },
   labelText: {
-    color: "#000",
-    textAlign: "center"
+    color: "#22292f"
   },
   inputTime: {
     textAlign: "center"
