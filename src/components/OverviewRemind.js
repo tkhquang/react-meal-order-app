@@ -27,16 +27,15 @@ class OverviewRemind extends Component {
         JSON.stringify({ payment_reminder: time })
       )
       .then(() => {
-        this.setState({
-          loading: false
-        });
         this.props.showAlert(true, "Modified payment time successfully!");
       })
       .catch(() => {
+        this.props.showAlert(false, "Failed to modify payment time!");
+      })
+      .finally(() => {
         this.setState({
           loading: false
         });
-        this.props.showAlert(false, "Failed to modify payment time!");
       });
   };
 

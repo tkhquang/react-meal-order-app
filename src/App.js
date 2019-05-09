@@ -51,7 +51,6 @@ class App extends Component {
       })
       .then(res => {
         this.setState({
-          loading: false,
           isAuthenticated: true,
           user: {
             name,
@@ -67,7 +66,6 @@ class App extends Component {
         this.signOut();
         if (err.response) {
           this.setState({
-            loading: false,
             error: {
               status: true,
               code: err.response.status,
@@ -79,11 +77,15 @@ class App extends Component {
           return;
         }
         this.setState({
-          loading: false,
           error: {
             status: true,
             message: "Network Error"
           }
+        });
+      })
+      .finally(() => {
+        this.setState({
+          loading: false
         });
       });
   };
@@ -94,7 +96,6 @@ class App extends Component {
         .post("/auth/google/logout")
         .then(() => {
           this.setState({
-            loading: false,
             isAuthenticated: false,
             user: null
           });
@@ -104,7 +105,6 @@ class App extends Component {
         .catch(err => {
           if (err.response) {
             this.setState({
-              loading: false,
               error: {
                 status: true,
                 code: err.response.status,
@@ -116,11 +116,15 @@ class App extends Component {
             return;
           }
           this.setState({
-            loading: false,
             error: {
               status: true,
               message: "Network Error"
             }
+          });
+        })
+        .finally(() => {
+          this.setState({
+            loading: false
           });
         });
       return;

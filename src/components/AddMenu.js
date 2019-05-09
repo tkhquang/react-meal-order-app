@@ -10,9 +10,9 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 class AddMenu extends Component {
   constructor(props) {
     super(props);
-    this.listRef = React.createRef();
     this.state = {
       loading: false,
+      itemNames: "",
       deadline: getFormattedDate(new Date(), 10, 30, 0),
       remind: getFormattedDate(new Date(), 14, 30, 0),
       error: {
@@ -22,6 +22,12 @@ class AddMenu extends Component {
       }
     };
   }
+
+  handleItemNamesChange = e => {
+    this.setState({
+      itemNames: e.target.value
+    });
+  };
 
   handleDeadlineChange = time => {
     this.setState({
@@ -37,7 +43,16 @@ class AddMenu extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    const itemList = this.listRef.current.value
+    if (!this.state.itemNames.trim()) {
+      this.setState({
+        error: {
+          status: true,
+          message: "This field cannot be empty!"
+        }
+      });
+      return;
+    }
+    const itemList = this.state.itemNames
       .split(/[\r\n]+/)
       .map(item => item.trim())
       .filter(i => Boolean(i));
@@ -59,15 +74,11 @@ class AddMenu extends Component {
     request
       .post("/menus", JSON.stringify(requestBody))
       .then(() => {
-        this.setState({
-          loading: false
-        });
         this.props.getMenu();
       })
       .catch(err => {
         if (err.response) {
           this.setState({
-            loading: false,
             error: {
               status: true,
               code: err.response.status,
@@ -79,11 +90,15 @@ class AddMenu extends Component {
           return;
         }
         this.setState({
-          loading: false,
           error: {
             status: true,
             message: "Network Error"
           }
+        });
+      })
+      .finally(() => {
+        this.setState({
+          loading: false
         });
       });
   };
@@ -104,12 +119,13 @@ class AddMenu extends Component {
               Add menu:
             </label>
             <textarea
-              ref={this.listRef}
               className="default-input w-full py-3 px-4 mb-3"
               name="list"
               cols="80"
               rows="12"
               placeholder="Add item list..."
+              value={this.state.itemNames}
+              onChange={this.handleItemNamesChange}
               required
             />
           </div>

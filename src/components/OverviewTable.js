@@ -19,17 +19,16 @@ class OverviewTable extends Component {
     request
       .delete(`/items/${id}`)
       .then(() => {
-        this.setState({
-          loading: false
-        });
         this.props.showAlert(true, "Item deleted successfully!");
         this.props.reFetchMenu();
       })
       .catch(() => {
+        this.props.showAlert(true, "Failed to delete item!");
+      })
+      .finally(() => {
         this.setState({
           loading: false
         });
-        this.props.showAlert(true, "Failed to delete item!");
       });
   };
 

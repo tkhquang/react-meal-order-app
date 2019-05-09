@@ -8,15 +8,21 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 class AddItem extends Component {
   constructor(props) {
     super(props);
-    this.addItemRef = React.createRef();
     this.state = {
-      loading: false
+      loading: false,
+      itemName: ""
     };
   }
 
+  handleItemNameChange = e => {
+    this.setState({
+      itemName: e.target.value
+    });
+  };
+
   handleAddItem = e => {
     e.preventDefault();
-    const itemName = this.addItemRef.current.value.trim();
+    const itemName = this.state.itemName.trim();
     if (!itemName) {
       this.props.showAlert(false, "This field cannot be empty!");
       return;
@@ -30,18 +36,19 @@ class AddItem extends Component {
         JSON.stringify({ item_name: itemName })
       )
       .then(() => {
-        this.addItemRef.current.value = "";
         this.setState({
-          loading: false
+          itemName: ""
         });
         this.props.showAlert(true, "Item added successfully!");
         this.props.reFetchMenu();
       })
-      .catch(err => {
+      .catch(() => {
+        this.props.showAlert(false, "Failed to add item!");
+      })
+      .finally(() => {
         this.setState({
           loading: false
         });
-        this.props.showAlert(false, "Failed to add item!");
       });
   };
 
@@ -60,7 +67,8 @@ class AddItem extends Component {
           className="h-10 mr-2 md:mx-2 w-1/2 md:w-1/3 px-2 appearance-none default-input"
           type="text"
           placeholder="Add one item..."
-          ref={this.addItemRef}
+          value={this.state.itemName}
+          onChange={this.handleItemNameChange}
           required
         />
         <Button

@@ -28,15 +28,15 @@ class MenuPage extends Component {
     try {
       const res = await request.get("/menus");
       this.setState({
-        refetching: false,
         data: { ...res.data }
       });
       return false;
     } catch (err) {
+      return err;
+    } finally {
       this.setState({
         refetching: false
       });
-      return err;
     }
   };
 
@@ -48,14 +48,12 @@ class MenuPage extends Component {
       .get("/menus")
       .then(res => {
         this.setState({
-          loading: false,
           data: { ...res.data }
         });
       })
       .catch(err => {
         if (err.response) {
           this.setState({
-            loading: false,
             error: {
               status: true,
               code: err.response.status,
@@ -67,11 +65,15 @@ class MenuPage extends Component {
           return;
         }
         this.setState({
-          loading: false,
           error: {
             status: true,
             message: "Network Error"
           }
+        });
+      })
+      .finally(() => {
+        this.setState({
+          loading: false
         });
       });
   };

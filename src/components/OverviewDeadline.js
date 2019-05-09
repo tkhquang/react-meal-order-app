@@ -26,16 +26,15 @@ class OverviewDeadline extends Component {
         JSON.stringify({ deadline: time })
       )
       .then(() => {
-        this.setState({
-          loading: false
-        });
         this.props.showAlert(true, "Modified deadline successfully!");
       })
       .catch(() => {
+        this.props.showAlert(false, "Failed to modify deadline!");
+      })
+      .finally(() => {
         this.setState({
           loading: false
         });
-        this.props.showAlert(false, "Failed to modify deadline!");
       });
   };
 

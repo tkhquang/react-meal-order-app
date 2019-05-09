@@ -31,16 +31,13 @@ class Overview extends Component {
       .get(`/menus/${this.props.data.menu.id}/people-in-charge`)
       .then(() => {
         this.props.reFetchMenu().then(err => {
-          if (err) {
-            this.setState({
-              loading: false
-            });
-            this.showAlert(false, "Failed to refetch menu!");
-            return;
-          }
           this.setState({
             loading: false
           });
+          if (err) {
+            this.showAlert(false, "Failed to refetch menu!");
+            return;
+          }
           this.showAlert(true, "Summarized menu successfully!");
         });
       })
