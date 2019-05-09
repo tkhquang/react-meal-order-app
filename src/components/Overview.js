@@ -38,9 +38,10 @@ class Overview extends Component {
             this.showAlert(false, "Failed to refetch menu!");
             return;
           }
+
           if (
-            !this.props.data.menu.items ||
-            this.props.data.menu.items
+            !this.props.data.items ||
+            this.props.data.items
               .filter(item => item.users)
               .reduce((a, b) => b.users && a + b.users.length, 0) === 0
           ) {
