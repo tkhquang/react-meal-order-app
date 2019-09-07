@@ -6,6 +6,10 @@
 
 A project to help Dwarves order lunch easier
 
+## Backend
+
+The project's backend [repository](https://github.com/jphuc96/go-meal-order-app)
+
 ## Project team
 
 - [Thong Nguyen](https://git.d.foundation/thongnt)
@@ -14,10 +18,4 @@ A project to help Dwarves order lunch easier
 - [Truc Huynh](https://git.d.foundation/trucht)
 - [Phuc Nguyen](https://git.d.foundation/phucnh)
 
-## Site map
-
-![](docs/SiteMap.png)
-
 ## Deployment
-
-The website was deployed to Netlify on datcom.netlify.com
